@@ -3,6 +3,8 @@ title: "reprex"
 author: "Allison Horst"
 date: "8/19/2021"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -10,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(here)
 library(janitor)
+library(reprex)
 ```
 
 Your job is to identify an error, then make a reproducible example that would help future you or someone else understand how to write the code correctly. In other words, your reprex code will *work* and offer a solution to the error thrown in each of the following examples. 
@@ -37,7 +40,28 @@ mack_creek_lengths <- mack_creek_vertebrates %>%
   clean_names() %>% 
   select(year:sampledate) %>% 
   filter(section == "CC") %>% 
-  mutate(across(where(is.character, tolower))) %>% 
+  mutate(across(where(is.character, tolower)))%>% #correct it with "," to ")"
+  drop_na(species) %>% 
+  group_by(species) %>% 
+  summarize(mean_length_cm = mean(length1, na.rm = TRUE),
+            sd_length_cm = sd(length1, na.rm = TRUE)) %>% 
+  ungroup()
+```
+
+```{r}
+#Reprex example 1
+library(datapasta)
+
+datapasta::df_paste(head(mack_creek_vertebrates, 5)[, c("SPECIES", "LENGTH1")])
+
+data.frame(
+  stringsAsFactors = FALSE,
+                                                            SPECIES = c("ONCL","ONCL","ONCL",
+                                                                        "ONCL","ONCL"),
+                                                            LENGTH1 = c(58,
+                                                                        61,89,58,93)
+                                                 )
+mutate(across(where(is.character, tolower)))%>% 
   drop_na(species) %>% 
   group_by(species) %>% 
   summarize(mean_length_cm = mean(length1, na.rm = TRUE),
@@ -51,11 +75,32 @@ Identify what is causing the problem in the code below (there's only one thing).
 
 ```{r}
 # Example 2:
+
 mack_creek_vertebrates %>% 
   clean_names() %>% 
   filter(species == "ONCL") %>% 
   ggplot(aes(x = length1, y = weight)) +
          geom_point(aes(shape = 12), color = "purple") +
+         theme_minimal() +
+         labs(x = "Cutthroat trout length (cm)",
+              y = "Weight (g)")
+```
+
+```{r}
+#Reprex ex 2
+
+library(datapasta)
+
+datapasta::df_paste(head(mack_creek_vertebrates, 5)[, c("WEIGHT", "LENGTH1")])
+  
+  
+   data.frame(
+                                                        WEIGHT = c(1.75,1.95,
+                                                                   5.6,2.15,6.9),
+                                                       LENGTH1 = c(58,61,89,
+                                                                   58,93)
+                                                  )
+   geom_point(aes(shape = 12), color = "purple") +
          theme_minimal() +
          labs(x = "Cutthroat trout length (cm)",
               y = "Weight (g)")
